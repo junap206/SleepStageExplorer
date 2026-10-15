@@ -32,3 +32,6 @@ def model_info():
 def health():
     return {"status": "ok"}
 
+@app.get("/version")
+def version():
+    return {"xgboost_version": meta["xgboost_version"]}
