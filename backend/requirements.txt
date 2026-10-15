@@ -5,4 +5,4 @@ scikit-learn
 pytz
 XGboost==3.4.1
 fastapi
-uvicorn[standard]
+uvicorn[standard]pytest
