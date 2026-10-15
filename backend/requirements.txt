@@ -1,0 +1,6 @@
+pandas
+numpy
+scipy
+scikit-learn
+pytz
+XGboost==3.4.1
