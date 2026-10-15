@@ -3,6 +3,9 @@ numpy
 scipy
 scikit-learn
 pytz
-XGboost==3.4.1
+xgboost==3.4.1
 fastapi
-uvicorn[standard]pytest
+uvicorn[standard]
+python-multipart
+httpx
+pytest
