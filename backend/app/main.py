@@ -7,6 +7,7 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from xgboost import XGBClassifier
 
 from app.predict import predict_stages
+from app.validation import MAX_UPLOAD_BYTES, find_problems
 from sleepstager.raw_data_service import RawDataService
 from sleepstager.recording_window import get_recording_window
 
@@ -46,19 +47,25 @@ def version():
 
 @app.post("/predict")
 async def predict(motion_file: UploadFile = File(...), hr_file: UploadFile = File(...)):
+    motion_bytes = await motion_file.read()
+    hr_bytes = await hr_file.read()
+    if len(motion_bytes) > MAX_UPLOAD_BYTES or len(hr_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="A file is too large. The limit is 200 MB per file.")
+
     with tempfile.TemporaryDirectory() as folder:
         motion_path = Path(folder) / "motion.csv"
         hr_path = Path(folder) / "hr.csv"
-        motion_path.write_bytes(await motion_file.read())
-        hr_path.write_bytes(await hr_file.read())
+        motion_path.write_bytes(motion_bytes)
+        hr_path.write_bytes(hr_bytes)
         try:
             motion = RawDataService.read_signal(str(motion_path), ["x", "y", "z"])
             heart_rate = RawDataService.read_signal(str(hr_path), ["bpm"])
         except (ValueError, pd.errors.ParserError, pd.errors.EmptyDataError):
-            raise HTTPException(status_code=400, detail="Could not read the files as CSV.")
+            raise HTTPException(status_code=400, detail=["Could not read the files as CSV."])
 
-    if motion.empty or heart_rate.empty:
-        raise HTTPException(status_code=400, detail="A file had no usable rows.")
+    problems = find_problems(motion, heart_rate)
+    if problems:
+        raise HTTPException(status_code=400, detail=problems)
 
     recording_start, _ = get_recording_window(motion)
     stages = predict_stages(model, meta, motion, heart_rate)
