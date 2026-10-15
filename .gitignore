@@ -7,3 +7,4 @@ node_modules/
 .env
 
 .vscode/
+backend/check_window.py
