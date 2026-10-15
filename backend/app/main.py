@@ -6,7 +6,8 @@ import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from xgboost import XGBClassifier
 
-from app.predict import predict_stages
+from app.predict import predict_from_features, predict_stages
+from app.samples import compute_metrics, list_samples, load_sample
 from app.validation import MAX_UPLOAD_BYTES, find_problems
 from sleepstager.raw_data_service import RawDataService
 from sleepstager.recording_window import get_recording_window
@@ -75,5 +76,36 @@ async def predict(motion_file: UploadFile = File(...), hr_file: UploadFile = Fil
         "recording_start": recording_start,
         "stage_names": meta["stage_names"],
         "stages": stages,
+        "disclaimer": DISCLAIMER,
+    }
+
+ATTRIBUTION = ("Sample nights come from an OPEN-ACCESS research dataset on "
+               "PhysioNet (ODC-By 1.0). The full citation in the README.")
+
+
+@app.get("/samples")
+def samples():
+    return {"samples": list_samples()}
+
+
+@app.get("/samples/{sample_id}")
+def sample_night(sample_id: str):
+    data = load_sample(sample_id)
+    if data is None:
+        raise HTTPException(status_code=404, detail="No such sample night.")
+
+    table = pd.DataFrame(data["features"], columns=data["feature_names"])
+    stages = predict_from_features(model, meta, table)
+
+    return {
+        "id": sample_id,
+        "n_epochs": data["n_epochs"],
+        "epoch_seconds": data["epoch_seconds"],
+        "recording_start": data["recording_start"],
+        "stage_names": meta["stage_names"],
+        "stages": stages,
+        "true_stages": data["true_stages"],
+        "metrics": compute_metrics(data["true_stages"], stages),
+        "attribution": ATTRIBUTION,
         "disclaimer": DISCLAIMER,
     }
