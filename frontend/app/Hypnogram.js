@@ -86,7 +86,7 @@ function NightTooltip({ active, payload, names, hasTruth }) {
         <div className="tip-row">
           <span className="key" style={{ background: EEG_COLOR }} />
           <strong>{hasEeg ? stageName(names, row.eegStage) : "No label"}</strong>
-          <span>EEG answer</span>
+          <span>Answer</span>
         </div>
       )}
       {hasTruth && hasEeg && (

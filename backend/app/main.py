@@ -85,8 +85,7 @@ async def predict(motion_file: UploadFile = File(...), hr_file: UploadFile = Fil
         "disclaimer": DISCLAIMER,
     }
 
-ATTRIBUTION = ("Sample nights come from an OPEN-ACCESS research dataset on "
-               "PhysioNet (ODC-By 1.0). The full citation in the README.")
+ATTRIBUTION = "Data: Song, Zhang, Zhou & Dutta (2026), PhysioNet, https://doi.org/10.13026/rees-1092. License: ODC-By 1.0."
 
 
 @app.get("/samples")

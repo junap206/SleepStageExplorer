@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { API } from "./api";
+import { API, DISCLAIMER } from "./api";
+import HowTo from "./HowTo";
 import Hypnogram from "./Hypnogram";
 import { percent, stageName, stageShares } from "./stages";
 
@@ -40,7 +41,7 @@ function FilePicker({ label, hint, onPick, disabled }) {
   );
 }
 
-export default function Upload() {
+export default function Upload({ onClose }) {
   const [motion, setMotion] = useState(null);
   const [hr, setHr] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -79,13 +80,21 @@ export default function Upload() {
 
   return (
     <section className="panel">
-      <h2 className="section-title" style={{ marginBottom: 0 }}>
-        Try your own night
-      </h2>
+      <div className="panel-head">
+        <h2 className="section-title" style={{ marginBottom: 0 }}>
+          Try your own night
+        </h2>
+        <button type="button" className="link-button" onClick={onClose}>
+          ← Back to start
+        </button>
+      </div>
+      <p className="disclaimer">{DISCLAIMER}</p>
       <p className="privacy">
         Your files are read once to make the estimate and are not saved. Nothing is
         kept after the page is closed.
       </p>
+
+      <HowTo />
 
       <form onSubmit={submit} className="upload-form">
         <div className="file-grid">
