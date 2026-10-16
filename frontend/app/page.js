@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-// Where the backend lives. NEXT_PUBLIC_ variables are copied into the code
-// that runs in the visitor's browser, so never put a secret in one.
-const API = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+import { API } from "./api";
+import Hypnogram from "./Hypnogram";
+import Upload from "./Upload";
+import { percent, stageName, stageShares } from "./stages";
 
 const DISCLAIMER =
-  "These predictions are not a medical diagnosis and should not be used for clinical decisions.";
+  "Research estimates from a wrist-worn device. Not a medical diagnosis.";
 
 async function getJson(path) {
   const response = await fetch(API + path);
@@ -15,30 +15,6 @@ async function getJson(path) {
     throw new Error("The server answered " + response.status);
   }
   return response.json();
-}
-
-// The backend may send stage names as a list or as an object keyed by number.
-function stageName(names, index) {
-  if (Array.isArray(names)) return names[index];
-  return names[index] ?? names[String(index)];
-}
-
-// Share of epochs in each stage (0, 1, 2), counting only epochs the EEG
-// experts could label (true stage -1 means unknown).
-function stageShares(stages, scored) {
-  const counts = [0, 0, 0];
-  let total = 0;
-  stages.forEach((stage, i) => {
-    if (scored[i] && stage >= 0) {
-      counts[stage] += 1;
-      total += 1;
-    }
-  });
-  return counts.map((count) => (total ? count / total : 0));
-}
-
-function percent(value) {
-  return (value * 100).toFixed(1) + "%";
 }
 
 export default function Home() {
@@ -80,9 +56,9 @@ export default function Home() {
       <header>
         <h1 className="title">Sleep Stager</h1>
         <p className="lede">
-          See how a machine learning model predicts sleep stages using only heart rate and movement data from an 
-          Apple Watch. The model analyzes sleep in 30-second intervals (epochs), predicting whether you were awake, in non-REM (NREM) sleep
-          or in REM sleep.
+          Estimates Wake, NREM and REM for every 30 seconds of a night, using
+          only wrist movement and heart rate. Try one of three sample nights
+          the model has never seen.
         </p>
       </header>
 
@@ -140,13 +116,15 @@ export default function Home() {
             </div>
           </div>
 
+          <Hypnogram night={night} />
+
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Sleep Stage</th>
-                  <th>Model Prediction</th>
-                  <th>Actual Stage (EEG-Verified)</th>
+                  <th>Stage</th>
+                  <th>Model</th>
+                  <th>EEG answer</th>
                 </tr>
               </thead>
               <tbody>
@@ -167,6 +145,8 @@ export default function Home() {
           </p>
         </section>
       )}
+
+      <Upload />
     </main>
   );
 }
