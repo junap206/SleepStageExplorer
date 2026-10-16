@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from xgboost import XGBClassifier
 
 from app.predict import predict_from_features, predict_stages
@@ -17,7 +18,12 @@ ARTIFACTS_DIR = Path(__file__).resolve().parent.parent / "artifacts"
 DISCLAIMER = "Research estimates from Applewatch device. This is NOT a medical diagnosis."
 
 app = FastAPI(title = "Sleep Stager API")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 model = XGBClassifier()
 model.load_model(ARTIFACTS_DIR / "xgb_model.json")
 
