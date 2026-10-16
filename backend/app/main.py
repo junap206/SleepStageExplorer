@@ -1,3 +1,4 @@
+import os
 import json
 import tempfile
 from pathlib import Path
@@ -18,9 +19,12 @@ ARTIFACTS_DIR = Path(__file__).resolve().parent.parent / "artifacts"
 DISCLAIMER = "Research estimates from Applewatch device. This is NOT a medical diagnosis."
 
 app = FastAPI(title = "Sleep Stager API")
+ALLOWED_ORIGINS = os.environ.get(
+    "ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+).split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
