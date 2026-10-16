@@ -88,7 +88,7 @@ export default function Home() {
 
       <section>
         <h2 className="section-title">Explore a sample night</h2>
-        {!samples && !error && <p>Loading sample nights…</p>}
+        {!samples && !error && <p>Loading sample nights (~30 seconds)...</p>}
         {error && <p className="error">{error}</p>}
         {samples && (
           <div className="picker">
