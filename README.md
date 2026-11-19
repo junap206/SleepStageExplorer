@@ -1,7 +1,6 @@
 # Sleep Stage Prediction Model
 
 Estimates **Wake, NREM and REM sleep** from wrist movement and heart rate.
-
 **https://sleep-stage-explorer.vercel.app**
 
 
