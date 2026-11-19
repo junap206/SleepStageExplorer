@@ -15,8 +15,11 @@ function Moon() {
   );
 }
 
-async function getJson(path) {
-  const response = await fetch(API + path);
+// The sample nights are precomputed into small JSON files in public/samples
+// (see backend/export_sample_results.py), so they load straight from the CDN
+// and never wait for the backend to wake up.
+async function getJson(url) {
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("The server answered " + response.status);
   }
@@ -33,11 +36,13 @@ export default function Home() {
 
   // Runs once, right after the page first appears in the browser.
   useEffect(() => {
-    getJson("/samples")
+    getJson("/samples/index.json")
       .then((data) => setSamples(data.samples))
-      .catch(() =>
-        setError("Could not reach the server. Is the backend running?")
-      );
+      .catch(() => setError("Could not load the sample nights. Try reloading."));
+
+    // The free backend host sleeps when idle and takes a while to start.
+    // Wake it now, in the background, so it is ready if the visitor uploads.
+    fetch(API + "/health").catch(() => {});
   }, []);
 
   async function openSample(id) {
@@ -50,7 +55,7 @@ export default function Home() {
     setLoadingId(id);
     setError(null);
     try {
-      const data = await getJson("/samples/" + id);
+      const data = await getJson("/samples/" + id + ".json");
       setNight(data);
       setOpenId(id);
       setShowUpload(false);
@@ -88,7 +93,7 @@ export default function Home() {
 
       <section>
         <h2 className="section-title">Explore a sample night</h2>
-        {!samples && !error && <p>Loading sample nights (~30 seconds)...</p>}
+        {!samples && !error && <p>Loading sample nights...</p>}
         {error && <p className="error">{error}</p>}
         {samples && (
           <div className="picker">
