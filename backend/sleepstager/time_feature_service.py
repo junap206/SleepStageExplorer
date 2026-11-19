@@ -6,7 +6,7 @@ Where the epoch sits in the night, and in the 24-hour biological day.
 minutes_elapsed and frac_through_night say how far into THIS RECORDING we are.
 The clock features say where we are in the day: two people who go to bed at
 22:00 and 02:00 are both "60 minutes in" at different points of their
-circadian cycle.
+circadian cycle - that difference matters for sleep staging.
 """
 
 import numpy as np
