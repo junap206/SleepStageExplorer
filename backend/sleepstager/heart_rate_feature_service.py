@@ -3,7 +3,7 @@ heart_rate_feature_service.py
 
 Per-epoch heart-rate features.
 
-Why normalise: across subjects heart rate differs by ~15 bpm, but between
+Why normalize? across subjects heart rate differs by ~15 bpm, but between
 sleep stages within one subject it differs by only ~3 bpm. Raw bpm mostly
 tells the model WHO the person is, not WHAT STAGE they are in. Subtracting
 the night's own median removes the person and leaves the stage signal.
