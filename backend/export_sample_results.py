@@ -3,13 +3,11 @@ export_sample_results.py
 
 Precomputes the model's answer for every sample night and writes it as static
 JSON into the frontend, so the website can show the sample nights instantly
-from the CDN without waiting for the backend to wake up.
+without waiting for the backend to wake up - should take less than a second now.
 
 Run it again whenever the model or the sample nights change, from the
 backend folder:
     python export_sample_results.py
-
-A test (tests/test_sample_cache.py) fails if the files fall out of date.
 """
 import json
 from pathlib import Path
